@@ -1,8 +1,8 @@
 
----------------------------------------------
+
 Concurrent Collections Specification Compiler
----------------------------------------------
- Author: Ryan Newton, Copyright 2009-2011
+=============================================
+  Author: Ryan Newton, Copyright 2009-2011
 
 
 This directory contains an implementation of a compiler/translator for
@@ -20,20 +20,20 @@ package through cabal.  Currently, this directory contains a Makefile
 and other scripts that are redundant with the cabal file and will be
 removed in the future.
 
-----------------------------------------------
+
  Building and running the CnC Spec Compiler:
 ----------------------------------------------
 
 The main entrypoint for the Spec tool is Intel/Cnc/Spec/Main.hs.
 
-OPTION 1: Type "make"
+ * OPTION 1: Type "make"
 
-OPTION 2: Try ghc --make directly
+ * OPTION 2: Try ghc --make directly
 
-OPTION 3: Try "cabal install" in this directory.
+ * OPTION 3: Try "cabal install" in this directory.
 
 
-----------------------------------------------
+
  Unit and system tests:
 ----------------------------------------------
 

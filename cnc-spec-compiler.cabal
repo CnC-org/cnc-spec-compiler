@@ -40,18 +40,27 @@ source-repository head
 
 Executable cnc
   Main-is:           Intel/Cnc/Spec/Main.hs
-  Build-Depends:     base >= 3 && < 5, directory, process, containers, unix, bytestring
+  Build-Depends:     base >= 3 && < 5
+                   , directory, process, containers, unix, bytestring, array
                    , prettyclass, pretty, HUnit, mtl
                    , stringtable-atom, filepath, split
                    , parsec >= 3.1.0
-                   , hubigraph
                    , hscurses, ansi-terminal
                    , fgl
                    , zlib, binary
--- Need these for GraphAnalysis.hs:
+-- graphviz is needed for GraphAnalysis.hs (not just visualization):
                    , Graphalyze 
 --		   , graphviz
 --                 , haxr, HTTP, network
+-- For visualization:
+                   , hubigraph
+--
+-- [2011.08.11] There are currently polyparse dependency problems.
+--   hubigraph -> haxr -> HaXml -> polyparse
+--
+-- I am addressing this currently by pinning older versions:
+                   , HaXml == 1.20.2
+                   , haxr  == 3000.8.2
 
   extensions: CPP
 -- Disabling for now.  We will make this optional:

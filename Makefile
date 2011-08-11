@@ -49,7 +49,7 @@ trans:
 	$(MAKE) $(BUILDDIR)/$(HCNCNAME)
 
 Intel/Cnc/Spec/Version.hs: 
-	runhaskell extract_version.hs
+	runhaskell ./scripts/extract_version.hs
 
 release:
 	GHCFLAGS="-rtsopts -O2" $(MAKE) $(BUILDDIR)/$(HCNCNAME).stripped
