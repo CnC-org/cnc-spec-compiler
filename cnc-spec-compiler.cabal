@@ -53,11 +53,11 @@ Executable cnc
 --		   , graphviz
 --                 , haxr, HTTP, network
 
-
+  extensions: CPP
 -- Disabling for now.  We will make this optional:
 --  cpp-options: -DCNCVIZ
 
   other-modules:  Intel.Cnc.Spec.AST    Intel.Cnc.Spec.CncLexer    Intel.Cnc.Spec.CncGrammar
                   Intel.Cnc.Spec.SrcLoc Intel.Cnc.Spec.GatherGraph Intel.Cnc.Spec.Codegen.CppOld
---  extensions: 
+
 --  GHC-Options: -O2 -threaded 

@@ -1,4 +1,4 @@
-{-# LANGUAGE FlexibleInstances, TypeSynonymInstances #-}
+{-# LANGUAGE FlexibleInstances, TypeSynonymInstances, CPP #-}
 
 ----------------------------------------------------------------------------------------------------
 -- A miscellaneous utility file used by the CnC Spec tool.
@@ -174,8 +174,10 @@ instance SynChunk Atom where
 
 
 -- Also, overloading the string constants themselves is nice:
+#if __GLASGOW_HASKELL__ >= 701
 instance IsString Doc where
     fromString s = text s
+#endif
 instance IsString Atom where
     fromString s = toAtom s
 
