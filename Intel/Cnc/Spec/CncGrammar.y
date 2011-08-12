@@ -34,12 +34,14 @@ import Debug.Trace
 -- For now we enable BOTH the new syntax and the legacy one:
 
 
+----------------------------------------------------------------------------------------------------
 -- First thing to declare is the name of your parser,
 -- and the type of the tokens the parser reads.
 
 %name parse_cnc
 %tokentype { Lexeme }
 
+----------------------------------------------------------------------------------------------------
 -- The parser will be of type [Token] -> ?, where ? is determined by the
 -- production rules. Now we declare all the possible tokens:
 
@@ -58,6 +60,8 @@ import Debug.Trace
 -- ':' { L _ LReservedOp ":" }
  ':' { L _ LSpecial ":" }
 
+ '{' { L _ LSpecial "{" }
+ '}' { L _ LSpecial "}" }
  '(' { L _ LSpecial "(" }
  ')' { L _ LSpecial ")" }
  '[' { L _ LSpecial "[" }
@@ -75,9 +79,8 @@ import Debug.Trace
  '/' { L _ LVarOp "/" }
  op { L _ LVarOp _ }
 
--- step { L _ LReservedId "step" }
- mod { L _ LReservedId "module" }
-
+-- NOTE:
+------------------------------------------------------------
  tags { L _ LReservedId "tags" }
  items { L _ LReservedId "items" }
  steps { L _ LReservedId "steps" }
@@ -90,6 +93,11 @@ import Debug.Trace
 -- FUTURE WORK: Reserving space in the grammar for presently
 -- unimplemented features [2011.04.12]:
  constrain { L _ LReservedId "constrain" }
+
+ cnc_graph { L _ LReservedId "cnc_graph" }
+ step { L _ LReservedId "step" }
+
+------------------------------------------------------------
 
         eof { L _ LEOF _ }
 
@@ -106,7 +114,8 @@ import Debug.Trace
 -- Like yacc, we include %% here, for no real reason.
 %%
 
--- Now the production rules.
+----------------------------------------------------------------------------------------------------
+-- Now the important part: the production rules that define the grammar
 ----------------------------------------------------------------------------------------------------
 
 
@@ -122,23 +131,41 @@ Statements : Statement Statements { $1 ++ $2 }
 -- Terminated_Relation : Relation ';' { $1 }
 -- Terminated_Decl : Decl ';' { $1 }
 
-Statement : Relation ';' { [$1] }
-           | Decl ';' { $1 }
+Statement
+           : StepDefn { $1 } -- Define new steps from within spec.
+           | ModuleDefn { $1 } -- Define a new reusable subgraph.
 
-           | type var '=' Type ';' { [TypeDef (lexPointSpan $2) (tAL $2) $4] }
--- | type var Type ';' { [TypeDef (lexPointSpan $2) (tAL $2) $3] }
+           | Relation ';' { [$1] }
+           | Decl ';' { $1 }
+           | TypeDefn { $1 } -- Define type aliases.
 
            -- These are just for better errors:
            | Relation eof { parseErrorSDoc (getDecor $1) $ text "Premature end of file, possible missing semi-colon." }
            | Decl eof { parseErrorSDoc (getDecorLs $1) $ text "Premature end of file, possible missing semi-colon." }
+    -- reduce/reduce conflict if we try this -- too bad:
+    -- | Relation Instance { parseErrorSDoc (getDecor $2) $ text "Possible missing semi-colon." }
 
--- reduce/reduce conflict
--- | Relation Instance { parseErrorSDoc (getDecor $2) $ text "Possible missing semi-colon." }
+TypeDefn : type var '=' Type ';' { [TypeDef (lexPointSpan $2) (tAL $2) $4] }
+-- : type var Type ';' { [TypeDef (lexPointSpan $2) (tAL $2) $3] }
+
+
+StatementBlock
+  : '{' '}' { [] }
+  | '{' Statements '}' { $2 }
+
+-- Presently, the only way to define a step within the spec is
+-- *hierarchically*, as a CnC [sub] graph.
+StepDefn
+  : step var StatementBlock { $3 } -- TEMPTOGGLE - FIXME FIXME
+
+ModuleDefn
+  : cnc_graph var '(' ')' StatementBlock { $5 } -- TEMPTOGGLE - FIXME FIXME
+
+
 
 Decl :: { [PStatement SrcSpan] }
 Decl
   : steps VarLs { map (\x -> DeclareSteps (lexSpan $1) (tAL x)) $2 }
-
                                            -- Here we try particularly hard to get good source location info:
   | constrain Instance ':' TagExps { [Constraints (cLLS $1 (lexSpan $3) $4) $2 $4] }
   -- One additional shift/reduce conflict if we do not use a separator:
@@ -147,7 +174,6 @@ Decl
   --| constrain Instance { [Constraints (lexSpan $1) (InstName "foo") []] }
   --| constrain var { [Constraints (lexSpan $1) (InstName "foo") []] }
 
-{- #if 0 -}
   | Mods tags var { [DeclareTags (cLL $2 $3) (tAL $3) Nothing] }
   -- [2010.07.20] I am having a strange problem making Mods optional:
 -- | Mods tags '<' Type '>' var { [DeclareTags (lexSpan $2) (lexStr $6) (Just $4)] }
@@ -245,8 +271,8 @@ Var : var { $1 }
     | dense { parseErrorSDoc (lexSpan $1) $ text "Keyword 'dense' used incorrectly." }
     | prescribes { parseErrorSDoc (lexSpan $1) $ text "Keyword 'prescribes' used incorrectly." }
     | constrain { parseErrorSDoc (lexSpan $1) $ text "Keyword 'constrain' used incorrectly." }
-    | mod { parseErrorSDoc (lexSpan $1) $ text "Keyword 'module' used incorrectly." }
--- | step { parseErrorSDoc (lexSpan $1) $ text "Keyword 'step' used incorrectly." }
+    | cnc_graph { parseErrorSDoc (lexSpan $1) $ text "Keyword 'module' used incorrectly." }
+    | step { parseErrorSDoc (lexSpan $1) $ text "Keyword 'step' used incorrectly." }
 
 
 Exp :: { Exp SrcSpan } -- The haskell type of the result of parsing this syntax class.
@@ -307,10 +333,11 @@ getDecorLs (h:t) = getDecor h
 happyError :: [Lexeme] -> a
 
 happyError [] = error "Parse error.  Strange - it's not before any token that I know of..."
-happyError ls =
- let loc = lexLoc $ head ls in
+happyError (hd:tl) =
+ let loc = lexLoc hd in
  error$ "Parse error before token at location : \n   " ++
         show (pPrint loc) ++
+ "\n Token: "++ show hd ++
  (if srcColumn loc <= 1
   then "\n(An error at the beginning of the line like this could be a missing semi-colon on the previous line.)\n"
   else "")
