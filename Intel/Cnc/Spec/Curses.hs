@@ -2,6 +2,8 @@
 
 {-| 
   A Curses-based user interface. 
+
+  Mostly finished.... but currently unused.
  -}
 
 module Intel.Cnc.Spec.Curses where

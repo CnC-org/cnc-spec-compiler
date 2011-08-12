@@ -45,7 +45,7 @@ import Control.Exception
 
 import System.Environment
 import System.Console.GetOpt
-import System.Console.ANSI
+import System.Console.ANSI 
 import System.FilePath.Posix
 import System.IO
 import System.IO.Unsafe

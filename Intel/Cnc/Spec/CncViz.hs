@@ -8,7 +8,7 @@ module Intel.Cnc.Spec.CncViz where
 
 import Intel.Cnc.Spec.TraceVacuum
 import Intel.Cnc.Spec.CncGraph
-import Intel.Cnc.Spec.Curses
+-- import Intel.Cnc.Spec.Curses () -- Disabling for now to avoid build deps [2011.08.12]; not used yet.
 import Intel.Cnc.Spec.Util
 import qualified Intel.Cnc.Spec.Passes.ReadHarch as H
 

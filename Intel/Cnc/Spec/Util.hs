@@ -174,10 +174,8 @@ instance SynChunk Atom where
 
 
 -- Also, overloading the string constants themselves is nice:
-#if __GLASGOW_HASKELL__ >= 701
-instance IsString Doc where
-    fromString s = text s
-#endif
+-- instance IsString Doc where -- Now this is in 'pretty' itself
+--     fromString s = text s
 instance IsString Atom where
     fromString s = toAtom s
 
