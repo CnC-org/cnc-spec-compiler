@@ -19,10 +19,121 @@ import qualified Prelude as P
 
 import Test.HUnit
 import qualified Data.Graph.Inductive as G
-import Data.Graph.Analysis.Algorithms.Common
+
+-- import Data.Graph.Analysis.Algorithms.Common (cyclesIn') -- from package Graphalyze
 
 import Intel.Cnc.Spec.GatherGraph (exampleGraph)
 import Text.PrettyPrint.HughesPJClass
+
+----------------------------------------------------------------------------------------------------
+
+-- <DUPLICATED CODE FROM GRAPHALYZE PACKAGE.>  (To avoid the extra dependencies.)
+-- This was distributed with the following further-reduced BSD-style license:
+--
+      -- Copyright (c) 2008, Ivan Lazar Miljenovic <Ivan.Miljenovic@gmail.com>
+      -- All rights reserved.
+
+      -- Redistribution and use in source and binary forms, with or without
+      -- modification, are permitted provided that the following conditions are met:
+
+      -- 1. Redistributions of source code must retain the above copyright notice,
+      --    this list of conditions and the following disclaimer.
+      -- 2. Redistributions in binary form must reproduce the above copyright
+      --    notice, this list of conditions and the following disclaimer in the
+      --    documentation and/or other materials provided with the distribution.
+
+      -- THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+      -- AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+      -- IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+      -- ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+      -- LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+      -- CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+      -- SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+      -- INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+      -- CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+      -- ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+      -- POSSIBILITY OF SUCH DAMAGE.
+
+import Control.Arrow(first)
+import Data.Function (on)
+import Control.Monad (ap)
+
+-- | A grouping of 'LNode's.
+type LNGroup a = [G.LNode a]
+-- | A grouping of 'Node's.
+type NGroup = [G.Node]
+
+addLabels    :: (G.Graph g) => g a b -> [G.Node] -> [G.LNode a]
+addLabels gr = map (ap (,) (fromJust . G.lab gr))
+
+-- | Return true if and only if the list contains a single element.
+single     :: [a] -> Bool
+single [_] = True
+single  _  = False
+
+-- | Makes the graph a simple one, by removing all duplicate edges and loops.
+--   The edges removed if duplicates exist are arbitrary.
+mkSimple :: (G.DynGraph gr) => gr a b -> gr a b
+mkSimple = G.gmap simplify
+    where
+      rmLoops n = filter ((/=) n . snd)
+      rmDups = nubBy ((P.==) `on` snd)
+      simpleEdges n = rmDups . rmLoops n
+      simplify (p,n,l,s) = (p',n,l,s')
+          where
+            p' = simpleEdges n p
+            s' = simpleEdges n s
+
+-- | Find all possible paths from this given node, avoiding loops,
+--   cycles, etc.
+pathTree             :: (G.DynGraph g) => G.Decomp g a b -> [NGroup]
+pathTree (Nothing,_) = []
+pathTree (Just ct,g)
+    | G.isEmpty g = []
+    | null sucs = [[n]]
+    | otherwise = (:) [n] . map (n:) . concatMap (subPathTree g') $ sucs
+    where
+      n = G.node' ct
+      sucs = G.suc' ct
+      -- Avoid infinite loops by not letting it continue any further
+      ct' = makeLeaf ct
+      g' = ct' G.& g
+      subPathTree gr n' = pathTree $ G.match n' gr
+
+-- | Remove all outgoing edges
+makeLeaf           :: G.Context a b -> G.Context a b
+makeLeaf (p,n,a,_) = (p', n, a, [])
+    where
+      -- Ensure there isn't an edge (n,n)
+      p' = filter (\(_,n') -> n' /= n) p
+
+-- | Find all cycles in the given graph.
+cyclesIn   :: (G.DynGraph g) => g a b -> [LNGroup a]
+cyclesIn g = map (addLabels g) (cyclesIn' g)
+
+-- | Find all cycles in the given graph, returning just the nodes.
+cyclesIn' :: (G.DynGraph g) => g a b -> [NGroup]
+cyclesIn' = concat . unfoldr findCycles . mkSimple
+
+-- | Find all cycles containing a chosen node.
+findCycles :: (G.DynGraph g) => g a b -> Maybe ([NGroup], g a b)
+findCycles g
+    | G.isEmpty g = Nothing
+    | otherwise = Just . getCycles . G.matchAny $ g
+    where
+      getCycles (ctx,g') = (cyclesFor (ctx, g'), g')
+
+-- | Find all cycles for the given node.
+cyclesFor :: (G.DynGraph g) => G.GDecomp g a b -> [NGroup]
+cyclesFor = map init .
+            filter isCycle .
+            pathTree .
+            first Just
+    where
+      isCycle p = not (single p) P.&& (head p P.== last p)
+
+-- </DUPLICATE>
+
 
 
 ----------------------------------------------------------------------------------------------------
