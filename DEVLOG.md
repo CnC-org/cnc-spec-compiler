@@ -16,82 +16,8 @@ just the haskell-platform packages installed globally.  Hence there
 are more packages for GHC 7.0.4:
 
     /usr/lib64/ghc-6.12.3/package.conf.d
-       Cabal-1.8.0.6
-       GLUT-2.1.2.1
-       HTTP-4000.0.9
-       HUnit-1.2.2.1
-       OpenGL-2.2.3.0
-       QuickCheck-2.1.1.1
-       X11-1.5.0.0
-       X11-xft-0.3
-       array-0.3.0.1
-       base-3.0.3.2
-       base-4.2.0.2
-       bin-package-db-0.0.0.0
-       binary-0.5.0.2
-       bytestring-0.9.1.7
-       cairo-0.11.1
-       cgi-3001.1.7.3
-       containers-0.3.0.0
-       darcs-2.4.4
-       dataenc-0.13.0.3
-       deepseq-1.1.0.0
-       directory-1.0.1.1
-       dph-base-0.4.0
-       dph-par-0.4.0
-       dph-prim-interface-0.4.0
-       dph-prim-par-0.4.0
-       dph-prim-seq-0.4.0
-       dph-seq-0.4.0
-       extensible-exceptions-0.1.1.1
-       feldspar-language-0.3.1
-       ffi-1.0
-       fgl-5.4.2.3
-       filepath-1.1.0.4
-       ghc-6.12.3
-       ghc-binary-0.5.0.2
-       ghc-prim-0.2.0.0
-       gio-0.11.1
-       glade-0.11.1
-       glib-0.11.2
-       gtk-0.11.2
-       gtksourceview2-0.11.1
-       hashed-storage-0.4.13
-       haskeline-0.6.3.1
-       haskell-platform-2010.2.0.0
-       haskell-src-1.0.1.3
-       haskell98-1.0.1.1
-       hpc-0.5.0.5
-       hscolour-1.16
-       html-1.0.1.2
-       integer-gmp-0.2.0.1
-       mmap-0.4.1
-       mtl-1.1.0.2
-       network-2.2.1.7
-       old-locale-1.0.0.2
-       old-time-1.0.0.5
-       pango-0.11.2
-       parallel-2.2.0.1
-       parsec-2.1.0.1
-       pretty-1.0.1.1
-       process-1.0.1.3
-       random-1.0.0.2
-       regex-base-0.93.2
-       regex-compat-0.93.1
-       regex-posix-0.94.2
-       rts-1.0
-       stm-2.1.2.1
-       syb-0.1.0.2
-       template-haskell-2.4.0.1
-       time-1.1.4
-       unix-2.4.0.2
-       utf8-string-0.3.6
-       xhtml-3000.2.0.1
-       xmonad-0.9.1
-       xmonad-contrib-0.9.1
-       zlib-0.5.2.0
-
-     /u/rrnewton/.ghc/x86_64-linux-6.12.3/package.conf.d
+      [... 76 globally installed packages ...]
+    /u/rrnewton/.ghc/x86_64-linux-6.12.3/package.conf.d
 	Graphalyze-0.11.0.0
 	HTTP-4000.0.9
 	HaXml-1.20.2
@@ -207,7 +133,7 @@ and it takes only 1 minute 27 seconds on basalt to do the whole thing.
       transformers-0.2.2.0
       zlib-0.5.3.1
 
-Took an additional five minutes to then reinstall without
+It then took an additional five minutes to then reinstall without
 -fBasicBuild.  Then CnC shows extra options for visualization.
 That installed an extra 14 packages, some of which are in haskell platform.
 
@@ -252,4 +178,5 @@ and:
       utf8-string-0.3.6
 
 Six and ten packages respectively.
+    36 -> 27 -> 13 -> 6
 
