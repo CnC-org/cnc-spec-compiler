@@ -1,5 +1,12 @@
 #!/usr/bin/env runhaskell
 
+
+-- module Main where
+-- import Distribution.Simple
+-- main :: IO ()
+-- main = defaultMain
+
+
 import Distribution.Simple
 import Distribution.Simple.PreProcess
 import Distribution.PackageDescription	
@@ -10,17 +17,13 @@ import System.Exit
 --main = defaultMainWithHooks simpleUserHooks
 -- --defaultUserHooks
 
-
---import Intel.Cnc
-
 main :: IO () 
 main = do putStrLn$ "Running Setup.hs ..."
-	  let hooks = simpleUserHooks 
 	  defaultMainWithHooks 
-	   (hooks {runTests = myTests
-	          --, hookedPreProcessors= (mypp : hookedPreProcessors hooks) 
-		  }) 
-
+	   simpleUserHooks 
+	   -- (simpleUserHooks  {
+	   --        --, hookedPreProcessors= (mypp : hookedPreProcessors hooks) 
+	   -- 	  }) 
 
 -- mypp :: PPSuffixHandler
 -- mypp = (".y.pp", \ _ _ -> ppTestHandler)
@@ -36,8 +39,4 @@ main = do putStrLn$ "Running Setup.hs ..."
 --           return ()
 --    }
 
-
-myTests :: Args -> Bool -> PackageDescription -> LocalBuildInfo -> IO () 
-myTests _ _ _ _ = do code <- system "./dist/build/haskell-cnc-runTests/haskell-cnc-runTests"
-		     exitWith code
 

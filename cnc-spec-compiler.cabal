@@ -1,6 +1,6 @@
 Name:           cnc-spec-compiler
 
-Version:        0.2
+Version:        0.2.0.0
 -- [2010.11.10] 0.1.3.100 Bumping slightly after change to CNC_ASSUME_TR1
 -- [2010.11.10] 0.1.3.101 New scheme for extracting version from cabal file.
 -- [2010.12.06] 0.1.3.102 Bumped for recent translator plugin rearchitecture.
@@ -29,7 +29,7 @@ Description: Intel (Concurrent Collections) CnC is a data-flow like
  patterns are stored in a specification, which can be used by this
  tool to generate code which will orchestrate the execution of the graph.
 
-Category: system, concurrent
+Category: Compilers/Interpreters, Parallelism
 Cabal-Version: >=1.6
 
 build-type: Simple
@@ -37,6 +37,12 @@ build-type: Simple
 source-repository head
   type:     git
   location: git://github.com/rrnewton/CnC-Spec-Compiler.git
+
+
+Flag BasicBuild 
+  Description: Minimize requirements to maximize build success.
+  Default:     False
+
 
 Executable cnc
   Main-is:           Intel/Cnc/Spec/Main.hs
@@ -64,9 +70,29 @@ Executable cnc
 
   extensions: CPP
 -- Disabling for now.  We will make this optional:
---  cpp-options: -DCNCVIZ
+--  if (! BasicBuild) 
+--    cpp-options: -DCNCVIZ
 
-  other-modules:  Intel.Cnc.Spec.AST    Intel.Cnc.Spec.CncLexer    Intel.Cnc.Spec.CncGrammar
-                  Intel.Cnc.Spec.SrcLoc Intel.Cnc.Spec.GatherGraph Intel.Cnc.Spec.Codegen.CppOld
+
+  other-modules:  
+                  -- Intel.Cnc.Spec.AST    Intel.Cnc.Spec.CncLexer    Intel.Cnc.Spec.CncGrammar
+                  -- Intel.Cnc.Spec.SrcLoc Intel.Cnc.Spec.GatherGraph Intel.Cnc.Spec.Codegen.CppOld
+                  -- Intel.Cnc.Spec.MainExecutable Intel.Cnc.Spec.Version Intel.Cnc.Spec.Globals
+                  -- Intel.Cnc.Spec.Util Intel.Cnc.Spec.CncGraph Intel.Cnc.Spec.TagFun
+                  -- Intel.Cnc.Spec.TypeDef
+                  -- Intel.Cnc.Spec.Passes.ReadHarch 
+                  Intel.Cnc.BenchSynth Intel.Cnc.EasyEmit Intel.Cnc.Spec.GraphAnalysis
+                  Intel.Cnc.Spec.CncLexer Intel.Cnc.Spec.GatherGraph Intel.Cnc.Spec.Main
+                  Intel.Cnc.Spec.MainExecutable Intel.Cnc.Spec.Util
+                  Intel.Cnc.Spec.Codegen.Plugins Intel.Cnc.Spec.Codegen.CppOld
+                  Intel.Cnc.Spec.Codegen.CodegenShared Intel.Cnc.Spec.Codegen.Haskell
+                  Intel.Cnc.Spec.Codegen.Plugins.Depends
+                  Intel.Cnc.Spec.Codegen.Plugins.TagFunCorrectness
+                  Intel.Cnc.Spec.Codegen.Plugins.ReductionDone
+                  Intel.Cnc.Spec.Passes.TypeDef Intel.Cnc.Spec.Passes.ReadHarch
+                  Intel.Cnc.Spec.TraceVacuum Intel.Cnc.Spec.Globals Intel.Cnc.Spec.AST
+                  Intel.Cnc.Spec.CncViz Intel.Cnc.Spec.CncGraph
+                  Intel.Cnc.Spec.CncGrammar Intel.Cnc.Spec.TagFun Intel.Cnc.Spec.Curses
+                  Intel.Cnc.Spec.SrcLoc Intel.Cnc.Spec.Version
 
 --  GHC-Options: -O2 -threaded 

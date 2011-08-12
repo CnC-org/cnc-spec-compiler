@@ -114,6 +114,12 @@ cleantests:
 
 #====================================================================================================
 
+pkgtest:
+	rm -rf dist/cnc-spec-compiler-*
+	cabal sdist
+	(cd dist; tar xzvf cnc-spec-compiler-*.tar.gz)
+	(cd dist/cnc-spec-compiler-*/ && cabal install)
+
 # cd graphPartitioner; $(MAKE)
 
 # Prevent odd make builtin rules re: cnc.sh
