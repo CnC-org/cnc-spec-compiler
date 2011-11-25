@@ -22,6 +22,10 @@ HSOURCE=SrcLoc.hs Main.hs GatherGraph.hs AST.hs Codegen/CppOld.hs Codegen/Haskel
 
 ifeq (,$(BUILDDIR))
   BUILDDIR= ./build/
+# What's a good cross-platform way to get a tempfile?
+#   TMP=$(shell tempfile)
+#   IGNORE=$(shell if [ ! -d $TMP ]; then rm -f $TMP;  mkdir -p $TMP; fi)
+#   BUILDDIR=/tmp/build_cnc_spec_compiler
 endif
 #BUILDDIR= ./
 HCNCNAME=cnc

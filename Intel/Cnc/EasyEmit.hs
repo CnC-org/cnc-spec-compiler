@@ -4,13 +4,13 @@
    This module provides a simple way to use HOAS (higher order abstract syntax) to emit C++ code.
 
    This is an AST-free method!  It doesn't define a complete model for
-   C++ code, just an easier way of emitting concretes syntax than
+   C++ code, just an easier way of emitting concrete syntax than
    using strings.
    
  -}
 
-module Intel.Cnc.EasyEmit where
-
+module Intel.Cnc.EasyEmit 
+where
 
 import Intel.Cnc.Spec.Util hiding (app, commasep)
 import Intel.Cnc.Spec.AST  
@@ -55,14 +55,16 @@ rawRunEasyEmit start (EE m) = (a, cnt, vcat (reverse ls))
  where 
   (a,(ls,cnt)) = S.runState m ([], start)
 
+-- | Retrieve only the generated code.
 execEasyEmit :: EasyEmit a -> Doc
 execEasyEmit = snd . runEasyEmit
 
+-- | Retrieve only the result value.
 evalEasyEmit :: EasyEmit a -> a
 evalEasyEmit = fst . runEasyEmit 
 
 
--- This runs a subcomputation only for value -- discards its emission side effects.
+-- This runs a subcomputation only for value, discarding its emission side effects.
 forValueOnly :: EasyEmit a -> EasyEmit a
 forValueOnly (EE m) =
  do (ls,c) <- S.get 
