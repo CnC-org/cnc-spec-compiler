@@ -98,8 +98,8 @@ cncSpecMember atom (CncSpec{..}) =
 ------------------------------------------------------------
 -- TEMP: For the benefit of the legacy syntax we harvest from instances as well as decls:
 collectInsts (Chain hds links : tl) root = 
-    let acc = foldl extendWithInstance (collectInsts tl root) hds in
-    foldl extendWithLink acc links
+    let acc = L.foldl extendWithInstance (collectInsts tl root) hds in
+    L.foldl extendWithLink acc links
 collectInsts (_ : tl) root = collectInsts tl root
 collectInsts [] root = root
 
@@ -118,9 +118,9 @@ extendWithInstance acc inst =
 
 extendWithLink acc link = 
   case link of 
-     ProduceLink    _ insts -> foldl extendWithInstance acc insts
-     RevProduceLink _ insts -> foldl extendWithInstance acc insts
-     PrescribeLink  _ insts -> foldl extendWithInstance acc insts
+     ProduceLink    _ insts -> L.foldl extendWithInstance acc insts
+     RevProduceLink _ insts -> L.foldl extendWithInstance acc insts
+     PrescribeLink  _ insts -> L.foldl extendWithInstance acc insts
 
 -- Merge type info if there's already an entry:
 mergeTy name ty amap = 

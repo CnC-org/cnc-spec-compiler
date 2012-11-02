@@ -43,9 +43,9 @@ Flag BasicBuild
   Description: Minimize requirements to maximize build success.
   Default:     False
 
-
 Executable cnc
   Main-is:           Intel/Cnc/Spec/Main.hs
+  Build-tools:       alex >= 3.0, happy 
   Build-Depends:     base >= 3 && < 5
                    , directory, process, containers, unix, bytestring, array
                    -- For IsString:

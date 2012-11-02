@@ -54,7 +54,7 @@ import Text.PrettyPrint.HughesPJClass
       -- ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
       -- POSSIBILITY OF SUCH DAMAGE.
 
-import Control.Arrow(first)
+import Control.Arrow as A
 import Data.Function (on)
 import Control.Monad (ap)
 
@@ -128,7 +128,7 @@ cyclesFor :: (G.DynGraph g) => G.GDecomp g a b -> [NGroup]
 cyclesFor = map init .
             filter isCycle .
             pathTree .
-            first Just
+            A.first Just
     where
       isCycle p = not (single p) P.&& (head p P.== last p)
 

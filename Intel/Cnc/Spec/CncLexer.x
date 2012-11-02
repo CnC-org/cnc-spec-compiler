@@ -2,6 +2,7 @@
 {
 module Intel.Cnc.Spec.CncLexer where
 -- import Debug.Trace
+import qualified Data.Char as C
 }
 
 %wrapper "monad"
@@ -129,24 +130,26 @@ data LexemeClass
   
 -- Handle a common case: create one token 
 mkL :: LexemeClass -> AlexInput -> Int -> Alex Lexeme
-mkL c (p,_,str) len = return (L p c (take len str))
+mkL c (p,_,_,str) len = return (L p c (take len str))
 
 
 -- This handles arbitrarily nested comments:
 nested_comment :: AlexInput -> Int -> Alex Lexeme
-nested_comment (apos, chr, str) int = do
+nested_comment (apos, chr, _, str) int = do
   input <- alexGetInput
   go 1 input "*/"
         -- When finished, set the position to after the comment ('input')
 --  where go 0 input acc = do alexSetInput input; alexMonadScan
-  where go 0 input acc = do alexSetInput input; (mkL LComment (apos,chr, reverse acc) (length acc))
+  where go 0 input acc = do alexSetInput input; (mkL LComment (apos,chr, error"CncLexer: what should go here?", reverse acc) (length acc))
 	go n input acc = do
 	  -- The 'n' parameter here keepstrack of the nesting.
           let prev = alexInputPrevChar input 
-	  case alexGetChar input of
+--	  case alexGetChar input of
+          -- New version of Alex (ver 3):
+	  case alexGetByte input of              
 	    Nothing  -> err input
-	    Just (c,input) -> do
-	      case c of
+	    Just (byte,input) -> do
+	      case C.chr (fromIntegral byte) of
 
                 -- We've got a potential comment ENDING:
 	    	'/' -> do
@@ -168,7 +171,7 @@ nested_comment (apos, chr, str) int = do
 
 lexError :: String -> Alex b 
 lexError s = do
-  (p,c,input) <- alexGetInput
+  (p,c,_,input) <- alexGetInput
   alexError (showPosn p ++ ": " ++ s ++ 
 		   (if (not (null input))
 		     then " before " ++ show (head input)
